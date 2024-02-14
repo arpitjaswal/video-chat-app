@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stylesheet.css">
+    <title>video streaming app</title>
+</head>
+<body>
+    <div>
+        <h1>Your ID: <span id="yourid""></span></h1>
+        <h3>Online users(click to connect):</h3>
+        <div id="users">
+
+        </div>
+
+        <div id="yourvideo">
+
+        </div>
+        <div id="othersvideo">
+
+        </div>
+
+        <p id="status"></p>
+    </div>
+
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const getAndUpdateUsers = async () => {
+            const usersDiv = document.getElementById('users');
+
+            const response = await fetch('/users', { method: 'GET' });
+            const jsonResponse = await response.json();
+
+            console.log(jsonResponse)
+
+            jsonResponse.forEach(user => {
+                const btn = document.createElement('button');
+                const textNode = document.createTextNode(user[0]);
+
+                btn.setAttribute('onclick', `createCall('${user[0]}')`);
+                btn.appendChild(textNode);
+                usersDiv.appendChild(btn);
+            });
+        }
+
+
+        socket.on('user:joined', (id) => {
+            const usersDiv = document.getElementById('users');
+            const btn = document.createElement('button');
+            const textNode = document.createTextNode(id);
+
+            btn.appendChild(textNode);
+            btn.setAttribute('onclick', `createCall('${id}')`);
+            usersDiv.appendChild(btn);
+        })
+
+        window.addEventListener('load', getAndUpdateUsers);
+    </script>
+
+</body>
+</html>
